@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebSocket Button</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #f0f0f0;
+        font-family: sans-serif;
+        margin: 0;
+      }
+
+      #toggleBtn {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        font-size: 2em;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      #toggleBtn.on {
+        background: green;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="toggleBtn">OFF</button>
+
+    <script>
+      const button = document.getElementById("toggleBtn");
+      const ws = new WebSocket("ws://192.168.1.71:8080");
+
+      let isOn = false;
+
+      ws.onopen = () => console.log("Connected to server");
+      ws.onerror = (err) => console.error("WebSocket error:", err);
+
+      button.addEventListener("click", () => {
+        isOn = !isOn;
+        button.classList.toggle("on", isOn);
+        button.textContent = isOn ? "ON" : "OFF";
+
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ pressed: isOn }));
+        }
+      });
+    </script>
+  </body>
+</html>
